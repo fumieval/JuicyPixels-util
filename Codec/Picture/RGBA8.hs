@@ -40,12 +40,24 @@ fromColorAndOpacity (PixelRGB8 r g b) (Image w h vec) = Image w h $ V.generate (
             else r
     {-# INLINE pix #-}
 
-trimImage :: Image PixelRGBA8 -> (Int, Int) -> (Int, Int) -> Image PixelRGBA8
+-- | Note: Accessing out of the image causes a segfault.
+trimImage :: Image PixelRGBA8
+    -> (Int, Int) -- ^ width, height
+    -> (Int, Int) -- ^ the left corner point
+    -> Image PixelRGBA8
 trimImage (Image w _ vec) (w', h') (x0, y0) = unsafePerformIO $ V.unsafeWith vec $ \ptr -> do
     mv <- MV.unsafeNew $ w' * h' * 4
-    MV.unsafeWith mv $ \dst -> forM_ [0..h'-1] $ \y -> do
+    MV.unsafeWith mv $ \dst -> forM_ [0..h'-1] $ \y -> 
         copyBytes (plusPtr dst $ y * w' * 4) (plusPtr ptr $ (*4) $ (y + y0) * w + x0) (4 * w')
     Image w' h' `fmap` V.unsafeFreeze mv
+
+-- | Note: Accessing out of the image causes a segfault.
+patchImage :: Image PixelRGBA8 -> (Int, Int) -> Image PixelRGBA8 -> Image PixelRGBA8
+patchImage (Image w h target) (x0, y0) (Image w' h' vec) = unsafePerformIO $ V.unsafeWith vec $ \ptr -> do
+    mv <- V.thaw target
+    MV.unsafeWith mv $ \dst -> forM_ [0..h'-1] $ \y ->
+        copyBytes (plusPtr dst $ (*4) $ (y + y0) * w + x0) (plusPtr ptr $ (*4) $ y * w') (4 * w')
+    Image w h `fmap` V.unsafeFreeze mv
 
 flipVertically :: Image PixelRGBA8 -> Image PixelRGBA8
 flipVertically (Image w h v) = unsafePerformIO $ V.unsafeWith v $ \ptr -> do

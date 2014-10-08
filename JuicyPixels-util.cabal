@@ -1,5 +1,5 @@
 name:                JuicyPixels-util
-version:             0.1
+version:             0.2
 synopsis:            Convert JuicyPixel images into RGBA format, flip, trim and so on
 description:         
 homepage:            https://github.com/fumieval/JuicyPixels-util
