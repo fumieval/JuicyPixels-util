@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances, FlexibleContexts, MagicHash #-}
+{-# LANGUAGE TypeSynonymInstances, FlexibleContexts, MagicHash, CPP #-}
 module Codec.Picture.RGBA8 where
 
 import Codec.Picture
@@ -12,7 +12,11 @@ import System.IO.Unsafe
 import Data.Bits
 import GHC.Ptr
 import GHC.Base
+#if MIN_VERSION_base(4,15,0)
+import GHC.Integer
+#else
 import GHC.Num
+#endif
 
 class ToPixelRGBA8 a where
     toRGBA8 :: a -> PixelRGBA8
