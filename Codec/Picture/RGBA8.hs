@@ -13,6 +13,7 @@ import Data.Bits
 import GHC.Ptr
 import GHC.Base
 import GHC.Num
+import GHC.Integer
 
 class ToPixelRGBA8 a where
     toRGBA8 :: a -> PixelRGBA8
